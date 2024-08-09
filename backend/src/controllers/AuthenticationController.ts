@@ -15,11 +15,11 @@ export class AuthenticationController {
     if (typeof req.body.username !== 'string') throw new Error('Bad Request: body.username is required')
 
     if (typeof req.body.password !== 'string') throw new Error('Bad Request: body.password is required')
-
+      
     const repository = database.getRepository(User)
 
     const user = await repository.findOneBy([
-      { email: req.body.username },
+      { email: req.body.email },
       { username: req.body.username }
     ])
 
