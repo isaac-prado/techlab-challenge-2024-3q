@@ -2,6 +2,43 @@
 
 Esse é o backlog do projeto. Aqui estão listadas todas as funcionalidades e correções que serão poderão adicionadas no projeto.
 
+## Bug - Consumidor com erro na aplicação
+
+<details close>
+
+<summary>Detalhes</summary>
+
+### Descrição
+
+Eventualmente o consumidor sofre com vários erros de conexão e não consegue mais se conectar. Precisamos investigar o que está acontecendo.
+
+</details>
+
+## SOLVED: Bug - Não está sendo carregado mais que 25 resultados na api
+
+<details close>
+
+<summary>Detalhes</summary>
+
+### Descrição
+
+A api está limitando a quantidade de resultados para 25. Precisamos ter visibilidade de todos os dados. As áreas são as conversas e também as mensagens das conversas.
+
+</details>
+
+## SOLVED: Bug - Atualização de usuários não está funcionando
+
+<details close>
+
+<summary>Detalhes</summary>
+
+### Descrição
+
+A atualização de usuários não está funcionando. Estamos tomando erro na api.
+
+
+</details>
+
 ## Débito Tecnico - Layout Amigável - M
 
 <details close>
@@ -221,19 +258,6 @@ Eu como atendente quero poder ativar o dark mode para que eu possa ter uma melho
 ### Descrição
 
 Adicionar validações nas requisições de API para garantir que os dados enviados estão corretos.
-
-</details>
-
-## Bug - Atualização de usuários não está funcionando
-
-<details close>
-
-<summary>Detalhes</summary>
-
-### Descrição
-
-A atualização de usuários não está funcionando. Estamos tomando erro na api.
-
 
 </details>
 
@@ -564,30 +588,6 @@ Eu como atendente quero que o sistema persista minha sessão para que eu não pr
 **E** abrir o sistema novamente
 <br>
 **Então** o atendente deve estar logado
-
-</details>
-
-## Bug - Não está sendo carregado mais que 25 resultados na api
-
-<details close>
-
-<summary>Detalhes</summary>
-
-### Descrição
-
-A api está limitando a quantidade de resultados para 25. Precisamos ter visibilidade de todos os dados. As áreas são as conversas e também as mensagens das conversas.
-
-</details>
-
-## Bug - Consumidor com erro na aplicação
-
-<details close>
-
-<summary>Detalhes</summary>
-
-### Descrição
-
-Eventualmente o consumidor sofre com vários erros de conexão e não consegue mais se conectar. Precisamos investigar o que está acontecendo.
 
 </details>
 

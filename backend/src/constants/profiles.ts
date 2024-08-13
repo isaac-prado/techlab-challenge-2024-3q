@@ -15,6 +15,6 @@ export const profiles = {
       `users:${user.id}:*`,
       'conversations:*',
     ],
-    allowToCreate: ['sudo', 'standard']
+    allowToCreate: ['standard']
   },
 } satisfies Record<string, IProfile>

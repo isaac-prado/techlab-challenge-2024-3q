@@ -84,9 +84,5 @@ export class UsersController {
 
     res.json(user)
   }
-
-  /**
-   * POST /users
-   */
    
 }
