@@ -15,12 +15,22 @@ export class ConsumersController {
    * GET /consumers
    */
   public async find(req: Request, res: Response) {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 50;
+
+    const skip = (page - 1) * limit
+
     const [consumers, count] = await this.repository.findAndCount({
-      take: 25,
-      skip: 0
+      take: limit,
+      skip: skip
     })
 
-    res.json({ count, consumers })
+    res.json({ 
+      count,
+      page,
+      totalPages: Math.ceil(count/limit),
+      consumers
+    })
   }
 
   /**
