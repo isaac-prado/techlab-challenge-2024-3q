@@ -34,7 +34,7 @@ export class ConsumersController {
   }
 
   /**
-   * PUT /consumers/sign-in
+   * POST /consumers/sign-in (não é PUT)
    */
   public async signIn(req: Request, res: Response) {
     if (typeof req.body != 'object') throw new Error('Bad Request: body must be an object')
@@ -69,7 +69,7 @@ export class ConsumersController {
       )
     })
 
-    res.json({ access_token: accessToken, token_type: 'Bearer', expires_in: 3600 })
+    res.json({ consumer, access_token: accessToken, token_type: 'Bearer', expires_in: 3600 })
   }
 
   /**

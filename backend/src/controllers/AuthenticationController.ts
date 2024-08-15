@@ -4,6 +4,7 @@ import { User } from "../entities/User.js";
 import jwt from 'jsonwebtoken'
 import { APP_NAME, SECRET } from "../constants/env.js";
 import { profiles } from "../constants/profiles.js";
+import bcrypt from "bcrypt";
 
 export class AuthenticationController {
   /**

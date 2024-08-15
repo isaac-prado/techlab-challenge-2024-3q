@@ -2,6 +2,8 @@ import { app } from "./app.js";
 import { APP_PORT } from "./constants/env.js";
 import { profiles } from "./constants/profiles.js";
 import { Consumer } from "./entities/Consumer.js";
+import { Conversation } from "./entities/Conversation.js";
+import { ConversationMessage, ConversationMessageBy } from "./entities/ConversationMessage.js";
 import { User } from "./entities/User.js";
 import { database } from "./services/database.js";
 import { faker } from "@faker-js/faker";
@@ -55,4 +57,38 @@ for (let i=0; i<50; i++) {
 await consumerRepository.save(consumers);
 
 console.log("Dados de CONSUMER inseridos com sucesso!");
+*/
+
+/* POPULANDO AS TABELAS Conversation e ConversationMessage
+const usersToPopulateConv = await database.manager.find(User);
+const consumersToPopulateConv = await database.manager.find(Consumer);
+
+for (let i=0; i<15; i++) {
+  const conversation = database.manager.create(Conversation, {
+    subject: faker.lorem.sentence(),
+    consumer: faker.helpers.arrayElement(consumersToPopulateConv),
+    user: faker.helpers.arrayElement(usersToPopulateConv),
+  });
+  await database.manager.save(conversation)
+
+  const numMessages = faker.number.int({ min: 3, max: 10 });
+  for (let i=0; i < numMessages; i++) {
+    const messageOwner = faker.helpers.arrayElement([
+      ConversationMessageBy.User,
+      ConversationMessageBy.Consumer,
+      ConversationMessageBy.System,
+    ]);
+
+    const message = database.manager.create(ConversationMessage, {
+      content: faker.lorem.paragraph(),
+      by: messageOwner,
+      conversation: conversation,
+      user: messageOwner === ConversationMessageBy.User ? conversation.user : null,
+    });
+
+    await database.manager.save(message)
+  }
+}
+
+console.log("Dados de Mensagem inseridos com")
 */
