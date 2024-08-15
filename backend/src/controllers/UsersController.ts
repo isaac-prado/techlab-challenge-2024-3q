@@ -62,12 +62,13 @@ export class UsersController {
     })
 
     if (!user) return res.status(404).json({ message: `Not found User with ID ${req.params.userId}` })
+    
+    const newUserData = { ...req.body };
 
-    await this.repository.save(
-      this.repository.merge(user, req.body)
-    )
+    const updatedUserEntity = this.repository.merge(user, newUserData);
+    await this.repository.save(updatedUserEntity);
 
-    res.json(user)
+    return res.json(updatedUserEntity);
   }
 
   /**

@@ -7,6 +7,7 @@ import { ConversationMessage, ConversationMessageBy } from "./entities/Conversat
 import { User } from "./entities/User.js";
 import { database } from "./services/database.js";
 import { faker } from "@faker-js/faker";
+import bcrypt from "bcrypt"
 
 await database.initialize()
 
@@ -14,28 +15,28 @@ app.listen(APP_PORT, () => {
   console.log(`server is running on port ${APP_PORT}`)
 })
 
-/* POPULANDO A TABELA Users
+/* POPULANDO A TABELA USER ( ERRO NO BCRYPT )
 
 const userRepository = database.getRepository(User)
 
-function createRandomUser(): Partial<User> {
+async function createRandomUser(): Promise<Partial<User>> {
+  const saltRounds = 10;
   return {
     username: faker.internet.userName(),
     email: faker.internet.email(),
-    password: faker.internet.password(),
+    password: await bcrypt.hash(faker.internet.password(), saltRounds),
     profile: faker.helpers.arrayElement(Object.keys(profiles)) as keyof typeof profiles,
   };
 }
 
 const users: Partial<User>[] = [];
 for (let i=0; i<30; i++) {
-  users.push(createRandomUser());
+  users.push(await createRandomUser());
 }
 
 await userRepository.save(users);
 
 console.log("Dados de USER inseridos com sucesso!");
-*/
 
 /* POPULANDO A TABELA Consumers
 const consumerRepository = database.getRepository(Consumer)
