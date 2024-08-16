@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { User } from "../entities/User.js";
 import { database } from "../services/database.js";
+import { Not } from "typeorm";
 
 export class UsersController {
   protected get repository() {
@@ -63,6 +64,26 @@ export class UsersController {
 
     if (!user) return res.status(404).json({ message: `Not found User with ID ${req.params.userId}` })
     
+    if (req.body.email && req.body.email !== user.email) {
+      const checkEmail = await this.repository.find({
+        where: { email: req.body.email, id: Not(req.params.userId )}
+      });
+
+      if (checkEmail) {
+        return res.status(400).json({ message: `Email address already used.` })
+      }
+    }
+
+    if (req.body.username && req.body.username !== user.username) {
+      const checkUsername = await this.repository.find({
+        where: { username: req.body.username, id: Not(req.params.userId)}
+      });
+
+      if (checkUsername) {
+        return res.status(400).json({ message: `Username already used.` })
+      }
+    }
+
     const newUserData = { ...req.body };
 
     const updatedUserEntity = this.repository.merge(user, newUserData);
