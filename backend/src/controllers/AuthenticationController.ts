@@ -34,7 +34,10 @@ export class AuthenticationController {
       
     const accessToken = await new Promise<string>((resolve, reject) => {
       jwt.sign(
-        { scopes: Array.isArray(scopes) ? scopes : [scopes] },
+        { scopes: Array.isArray(scopes) ? scopes : [scopes],
+          role: user.profile, // adicionando role: sudo || standard
+
+        },
         SECRET,
         {
           audience: APP_NAME,

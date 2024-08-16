@@ -40,11 +40,7 @@ export function ConversationsScreen() {
     <Grid container spacing={2} pl={0.1}>
       <Grid item xs={2}>
         <Grid container spacing={1}>
-          {conversations?.filter(conversation => {
-            if (user.profile === "sudo") return conversation
-            else return conversation.IUser?.id === user.id
-          })
-          .map(conversation => (
+          {conversations?.map(conversation => (
             <Grid item key={`conversations:${conversation.id}`}>
               <ConversationItem conversation={conversation}/>
             </Grid>

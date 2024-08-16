@@ -16,11 +16,17 @@ export class ConversationsController {
   public async find(req: Request, res: Response) {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 50;
-
     const skip = (page - 1) * limit
 
+    const userId = req.token?.sub.split(':')[1];
+    const userRole = req.token?.role;
+    let whereCondition: any = {};
+
+    if (userRole !== 'sudo') whereCondition = { user: { id: userId }};
+
     const [conversations, count] = await this.repository.findAndCount({
-      relations: { consumer: true, user: true },
+      relations: { consumer: true, user: true, messages: true },
+      where: whereCondition,
       take: limit,
       skip: skip
     })
