@@ -16,6 +16,12 @@ app.use(cors())
 app.use(Express.json())
 
 app.post(
+  '/users',
+  scope('users: write'),
+  _catch((req, res) => singleton(UsersController).createUser(req, res))
+);
+
+app.post(
   '/auth/sign-in',
   _catch((req, res, next) => {
     singleton(AuthenticationController).signIn(req, res).catch(next)

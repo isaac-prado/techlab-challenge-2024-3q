@@ -51,7 +51,7 @@ Adicionar um layout amigável para o sistema. Hoje os frontend foram entregues p
 
 </details>
 
-## <span style='color: red'>*</span> User Story - Sistema de distribuição de atendimento - M
+## <span style='color: red'>*</span> SOLVED: User Story - Sistema de distribuição de atendimento - M
 
 <details close>
 
@@ -591,7 +591,7 @@ Eu como atendente quero que o sistema persista minha sessão para que eu não pr
 
 </details>
 
-## User Story - Criação de outros usuários - M
+## SOLVED: User Story - Criação de outros usuários - M
 
 <details close>
 
@@ -617,7 +617,7 @@ Eu como administrador quero poder criar outros usuários para que eu possa ter m
 
 </details>
 
-## <span style='color: red'>*</span> User Story - O Atendente ver apenas conversas atribuidas a ele - P
+## <span style='color: red'>*</span> SOLVED User Story - O Atendente ver apenas conversas atribuidas a ele - P
 
 <details close>
 

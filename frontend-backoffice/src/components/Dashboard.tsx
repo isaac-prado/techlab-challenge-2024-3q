@@ -3,10 +3,23 @@ import { Link, Outlet } from "react-router-dom";
 import { useHasScope } from "../hooks/useAuthenticationContext.js";
 import PeopleIcon from '@mui/icons-material/People'
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
+import { CreateUserDialog } from "./CreateUserDialog.js";
+import { useState } from "react";
 
 const drawerWidth = 240;
 
 export function Dashboard() {
+  const [dialogoOpen, setDialogOpen] = useState(false);
+
+  const handleOpenDialog = () => {
+    setDialogOpen(true);
+  }
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+  }
+
+
   return (
     <Box sx={{ display: 'flex' }}>
       <Box
@@ -35,16 +48,27 @@ export function Dashboard() {
                 </ListItem>
               </Link>
               {useHasScope('users:*', 'users:read') && (
-                <Link to='/users'>
+                <>
+                  <Link to='/users'>
+                    <ListItem disablePadding>
+                      <ListItemButton>
+                        <ListItemIcon>
+                          <PeopleIcon />
+                        </ListItemIcon>
+                        <ListItemText primary='Usuários' />
+                      </ListItemButton>
+                    </ListItem>
+                  </Link>
+                  
                   <ListItem disablePadding>
-                    <ListItemButton>
+                    <ListItemButton onClick={handleOpenDialog}>
                       <ListItemIcon>
                         <PeopleIcon />
                       </ListItemIcon>
-                      <ListItemText primary='Usuários' />
+                      <ListItemText primary='Criar Usuário' />
                     </ListItemButton>
                   </ListItem>
-                </Link>
+                </>
               )}
             </List>
             <Divider />
@@ -57,6 +81,7 @@ export function Dashboard() {
       >
         <Outlet />
       </Box>
+      <CreateUserDialog open={dialogoOpen} onClose={handleCloseDialog}/>
     </Box>
   )
 }
