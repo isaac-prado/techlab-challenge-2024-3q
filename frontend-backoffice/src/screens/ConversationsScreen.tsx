@@ -7,7 +7,13 @@ import { IConversation } from "../interfaces/IConversation.js";
 import { Outlet } from "react-router-dom";
 
 export function ConversationsScreen() {
-  const user = useAuthenticatedUser()
+  let user;
+  try {
+    user = useAuthenticatedUser()
+  } catch (err) {
+    return (<div>Loading or not authenticated</div>)
+  }
+
   const accessToken = useAccessToken()
 
   const query = useQuery({
@@ -35,8 +41,8 @@ export function ConversationsScreen() {
       <Grid item xs={2}>
         <Grid container spacing={1}>
           {conversations?.filter(conversation => {
-            if (user.profile === "sudo") return true
-            else return conversation.userId.id === user.id
+            if (user.profile === "sudo") return conversation
+            else return conversation.IUser?.id === user.id
           })
           .map(conversation => (
             <Grid item key={`conversations:${conversation.id}`}>

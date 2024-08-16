@@ -5,5 +5,5 @@ export interface IConversation {
   id: string
   subject: string
   consumer: IConsumer
-  userId: IUser
+  IUser: IUser
 }
