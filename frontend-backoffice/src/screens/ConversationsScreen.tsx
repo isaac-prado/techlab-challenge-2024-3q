@@ -9,12 +9,12 @@ import { Outlet } from "react-router-dom";
 export function ConversationsScreen() {
   let user;
   try {
-    user = useAuthenticatedUser()
+    user = useAuthenticatedUser();
   } catch (err) {
     return (<div>Loading or not authenticated</div>)
   }
 
-  const accessToken = useAccessToken()
+  const accessToken = useAccessToken();
 
   const query = useQuery({
     queryKey: ['conversations'],
