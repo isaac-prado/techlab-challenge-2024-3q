@@ -20,7 +20,7 @@ export class ConversationsController {
     const skip = (page - 1) * limit
 
     const [conversations, count] = await this.repository.findAndCount({
-      relations: { consumer: true },
+      relations: { consumer: true, user: true },
       take: limit,
       skip: skip
     })
