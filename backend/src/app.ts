@@ -125,7 +125,7 @@ app.delete(
   '/users/:userId',
   scope('users:*', 'users:write', req => [`users:${req.params.userId}:*`, `users:${req.params.userId}:write`]),
   _catch((req, res) => 
-    singleton(UsersController).save(req, res)
+    singleton(UsersController).delete(req, res)
   )
 )
 
