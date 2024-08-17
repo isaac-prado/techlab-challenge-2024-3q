@@ -1,12 +1,13 @@
-import { Box, Button, Grid } from "@mui/material";
-import { useAccessToken, useAuthenticatedUser } from "../hooks/useAuthenticationContext.js";
+import { Box, Grid, Typography } from "@mui/material";
+import { useAccessToken } from "../hooks/useAuthenticationContext.js";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../services/api.js";
 import { ConversationItem } from "../components/ConversationItem.js";
 import { IConversation } from "../interfaces/IConversation.js";
 import { Outlet } from "react-router-dom";
 import { useState } from "react";
-import { blue, grey, teal } from "@mui/material/colors";
+import { grey, teal } from "@mui/material/colors";
+import { PaginationButton } from "../components/PaginationButton.js";
 
 export function ConversationsScreen() {
   const [page, setPage] = useState(1);
@@ -37,13 +38,9 @@ export function ConversationsScreen() {
   const conversations = query.data?.conversations ?? null;
   const totalPages = query.data?.totalPages ?? 1;
 
-  const handlePreviousPage = () => {
-    setPage((prev) => Math.max(prev-1, 1));
-  }
-
-  const handleNextPage = () => {
-    setPage((prev) => Math.min(prev + 1, totalPages));
-  }
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
 
   return (
     <Box sx={{ overflowY: 'auto', height: '100vh', padding: 2 }}>
@@ -80,11 +77,20 @@ export function ConversationsScreen() {
                   width: '100%',
                   mb: 2,
                   '&:hover': {
-                    bgcolor: grey[300],
+                    bgcolor: grey[300], 
+                    
                   },
                 }}
               >
-                <ConversationItem conversation={conversation} />
+                <Typography
+                  variant="h6"
+                  sx={{
+                    color: teal[700],
+                    fontWeight: 'bold',
+                  }}
+                >
+                  <ConversationItem conversation={conversation} />
+                </Typography>
               </Box>
             ))}
           </Box>
@@ -95,24 +101,20 @@ export function ConversationsScreen() {
             zIndex={1000}
             sx={{ padding: '8px' }}
           >
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handlePreviousPage}
-              disabled={page === 1}
-              sx={{ mr: 2, bgcolor: teal[500], '&:hover': { bgcolor: teal[700] } }}
+            <Box
+              position="fixed"
+              top={16}
+              right={16}
+              zIndex={1000}
+              sx={{ padding: '8px' }}
             >
-              Anterior
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleNextPage}
-              disabled={page === totalPages}
-              sx={{ bgcolor: blue[500], '&:hover': { bgcolor: blue[700] } }}
-            >
-              Próximo
-            </Button>
+              <PaginationButton
+                page={page}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </Box>
+
           </Box>
         </Grid>
         <Grid item xs={8} sx={{ overflowY: 'auto', height: '100%' }}>

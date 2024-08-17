@@ -2,9 +2,11 @@ import { Box, Drawer, Divider, List, ListItem, ListItemButton, ListItemIcon, Lis
 import { Link, Outlet } from "react-router-dom";
 import { useHasScope } from "../hooks/useAuthenticationContext.js";
 import PeopleIcon from '@mui/icons-material/People'
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 import { CreateUserDialog } from "./CreateUserDialog.js";
 import { useState } from "react";
+import { LogoutButton } from "./LogoutButton.js";
 
 const drawerWidth = 240;
 
@@ -63,13 +65,26 @@ export function Dashboard() {
                   <ListItem disablePadding>
                     <ListItemButton onClick={handleOpenDialog}>
                       <ListItemIcon>
-                        <PeopleIcon />
+                        <AddCircleOutlineIcon />
                       </ListItemIcon>
                       <ListItemText primary='Criar Usuário' />
                     </ListItemButton>
                   </ListItem>
                 </>
               )}
+
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '100%',
+                  width: '100%',
+                  mt: 2,
+                }}
+              >
+                <LogoutButton />
+              </Box>
             </List>
             <Divider />
           </div>

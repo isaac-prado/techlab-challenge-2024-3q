@@ -20,6 +20,7 @@ export interface IAuthenticationContext {
   user: IUser | null
   isLoading: boolean
   signIn(payload: IAuthenticationSignInPayload): void
+  logout(): void
 }
 
 export const AuthenticationContext = createContext(null as unknown as IAuthenticationContext)
@@ -42,6 +43,11 @@ export function AuthenticationProvider({ children }: PropsWithChildren) {
       localStorage.setItem('user', JSON.stringify(response.data.access_token));
     },
   })
+
+  const logout = () => {
+    setAccessToken(null);
+    localStorage.removeItem('user');
+  }
 
   const token = useMemo(() => {
     if (!accessToken) return null
@@ -81,7 +87,7 @@ export function AuthenticationProvider({ children }: PropsWithChildren) {
 
   const isLoading = useMemo(() => userQuery.isLoading || signIn.isPending, [signIn.isPending, userQuery.isLoading])
 
-  const value = useMemo(() => ({ token, accessToken, user, isLoading, signIn: signIn.mutate }), [token, accessToken, user, isLoading, signIn.mutate])
+  const value = useMemo(() => ({ token, accessToken, user, isLoading, signIn: signIn.mutate, logout }), [token, accessToken, user, isLoading, signIn.mutate, logout])
 
   return (
     <AuthenticationContext.Provider value={value}>
