@@ -563,7 +563,7 @@ Eu como atendente quero ver a última mensagem enviada para que eu saiba o que f
 
 </details>
 
-## User Story - Persistencia na sessão do atendente - M
+## SOLVED: User Story - Persistencia na sessão do atendente - M
 
 <details close>
 

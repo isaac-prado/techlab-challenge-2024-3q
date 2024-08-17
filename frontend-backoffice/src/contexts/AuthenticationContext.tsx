@@ -1,4 +1,4 @@
-import { createContext, PropsWithChildren, useMemo, useState } from "react";
+import { createContext, PropsWithChildren, useMemo, useState, useEffect } from "react";
 import { IUser } from "../interfaces/IUser.js";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { api } from "../services/api.js";
@@ -26,11 +26,20 @@ export const AuthenticationContext = createContext(null as unknown as IAuthentic
 
 export function AuthenticationProvider({ children }: PropsWithChildren) {
   const [accessToken, setAccessToken] = useState<string | null>(null)
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setAccessToken(JSON.parse(storedUser));
+    }
+  }, []);
+
   const signIn = useMutation({
     mutationFn: async ({ username, password }: IAuthenticationSignInPayload) => {
       const response = await api.post('/auth/sign-in', { username, password })
 
       setAccessToken(response.data.access_token)
+      localStorage.setItem('user', JSON.stringify(response.data.access_token));
     },
   })
 
@@ -80,3 +89,4 @@ export function AuthenticationProvider({ children }: PropsWithChildren) {
     </AuthenticationContext.Provider>
   )
 }
+
