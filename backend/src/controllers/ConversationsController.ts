@@ -28,7 +28,10 @@ export class ConversationsController {
       relations: { consumer: true, user: true, messages: true },
       where: whereCondition,
       take: limit,
-      skip: skip
+      skip: skip,
+      order: {
+        createdAt: 'DESC',
+      }
     })
 
     res.json({
