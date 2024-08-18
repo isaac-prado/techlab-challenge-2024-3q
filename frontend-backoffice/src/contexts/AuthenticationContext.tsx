@@ -1,4 +1,4 @@
-import { createContext, PropsWithChildren, useMemo, useState } from "react";
+import { createContext, PropsWithChildren, useMemo, useState, useEffect } from "react";
 import { IUser } from "../interfaces/IUser.js";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { api } from "../services/api.js";
@@ -20,19 +20,34 @@ export interface IAuthenticationContext {
   user: IUser | null
   isLoading: boolean
   signIn(payload: IAuthenticationSignInPayload): void
+  logout(): void
 }
 
 export const AuthenticationContext = createContext(null as unknown as IAuthenticationContext)
 
 export function AuthenticationProvider({ children }: PropsWithChildren) {
   const [accessToken, setAccessToken] = useState<string | null>(null)
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setAccessToken(JSON.parse(storedUser));
+    }
+  }, []);
+
   const signIn = useMutation({
     mutationFn: async ({ username, password }: IAuthenticationSignInPayload) => {
       const response = await api.post('/auth/sign-in', { username, password })
 
       setAccessToken(response.data.access_token)
+      localStorage.setItem('user', JSON.stringify(response.data.access_token));
     },
   })
+
+  const logout = () => {
+    setAccessToken(null);
+    localStorage.removeItem('user');
+  }
 
   const token = useMemo(() => {
     if (!accessToken) return null
@@ -72,7 +87,7 @@ export function AuthenticationProvider({ children }: PropsWithChildren) {
 
   const isLoading = useMemo(() => userQuery.isLoading || signIn.isPending, [signIn.isPending, userQuery.isLoading])
 
-  const value = useMemo(() => ({ token, accessToken, user, isLoading, signIn: signIn.mutate }), [token, accessToken, user, isLoading, signIn.mutate])
+  const value = useMemo(() => ({ token, accessToken, user, isLoading, signIn: signIn.mutate, logout }), [token, accessToken, user, isLoading, signIn.mutate, logout])
 
   return (
     <AuthenticationContext.Provider value={value}>
@@ -80,3 +95,4 @@ export function AuthenticationProvider({ children }: PropsWithChildren) {
     </AuthenticationContext.Provider>
   )
 }
+

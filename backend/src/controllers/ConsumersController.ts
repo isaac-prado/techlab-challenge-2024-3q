@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken'
 import { APP_NAME, SECRET } from "../constants/env.js";
 import { FindOptionsWhere } from "typeorm";
 import { ConversationMessage, ConversationMessageBy } from "../entities/ConversationMessage.js";
+import { findFreeUser } from "../tools/findFreeUser.js";
 export class ConsumersController {
   protected get repository() {
     return database.getRepository(Consumer)
@@ -15,16 +16,26 @@ export class ConsumersController {
    * GET /consumers
    */
   public async find(req: Request, res: Response) {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 50;
+
+    const skip = (page - 1) * limit
+
     const [consumers, count] = await this.repository.findAndCount({
-      take: 25,
-      skip: 0
+      take: limit,
+      skip: skip
     })
 
-    res.json({ count, consumers })
+    res.json({ 
+      count,
+      page,
+      totalPages: Math.ceil(count/limit),
+      consumers
+    })
   }
 
   /**
-   * PUT /consumers/sign-in
+   * POST /consumers/sign-in
    */
   public async signIn(req: Request, res: Response) {
     if (typeof req.body != 'object') throw new Error('Bad Request: body must be an object')
@@ -59,7 +70,7 @@ export class ConsumersController {
       )
     })
 
-    res.json({ access_token: accessToken, token_type: 'Bearer', expires_in: 3600 })
+    res.json({ consumer, access_token: accessToken, token_type: 'Bearer', expires_in: 3600 })
   }
 
   /**
@@ -139,44 +150,56 @@ export class ConsumersController {
    * POST /consumers/:consumer-id/conversations
    */
   public async addConversation(req: Request<{ consumerId: string }>, res: Response) {
-    const consumer = await this.repository.findOne({
-      where: { id: req.params.consumerId }
-    })
+    try {
+      const consumer = await this.repository.findOne({
+        where: { id: req.params.consumerId }
+      })
+  
+      if (!consumer)
+        return res.status(404).json({ message: `Not found Consumer with ID ${req.params.consumerId}` })
+  
+      const selectedUser = await findFreeUser();
+  
+      if (!selectedUser) {
+        return res.status(404).json({ message: 'No Users available for attendance' });
+      }
+  
+      const messages: Record<string, unknown>[] = Array.isArray(req.body?.messages) ? req.body.messages : []
+  
+      const conversation = await database.getRepository(Conversation).save({
+        consumer,
+        user: selectedUser,
+        messages: messages.map((message, index) => {
+          if (typeof message !== 'object') throw new Error('Bad Request: messages must be an array of objects')
+          if (typeof message.content !== 'string') throw new Error(`Bad Request: req.body.messages.${index}.content must be a string`)
+          if (typeof message.by !== 'string') throw new Error(`Bad Request: req.body.messages.${index}.by must be a string`)
+    
+          if (!Object.values(ConversationMessageBy).includes(message.by as ConversationMessageBy))
+            throw new Error(`Bad Request: req.body.messages.${index}.by must be one of ${Object.values(ConversationMessageBy).join(', ')}`)
+    
+          if (typeof message.createdAt !== 'string') throw new Error(`Bad Request: req.body.messages.${index}.createdAt must be a string`)
+    
+          const createdAt = new Date(message.createdAt)
+    
+          if (isNaN(createdAt.getTime())) 
+            throw new Error(`Bad Request: req.body.messages.${index}.createdAt must be a valid date`)
+          
+          return database.getRepository(ConversationMessage).create({
+            content: message.content,
+            by: message.by as ConversationMessageBy,
+            createdAt,
+          });
+        }),
+        subject: req.body.subject,
+      })
 
-    if (!consumer)
-      return res.status(404).json({ message: `Not found Consumer with ID ${req.params.consumerId}` })
+      res.status(201)
+        .header('Location', `/conversations/${conversation.id}`)
+        .json(conversation)
 
-    const messages: Record<string, unknown>[] = Array.isArray(req.body?.messages) ? req.body.messages : []
-
-    const conversation = await database.getRepository(Conversation).save({
-      consumer,
-      messages: messages.map((message, index) => {
-        if (typeof message !== 'object') throw new Error('Bad Request: messages must be an array of objects')
-
-        if (typeof message.content !== 'string') throw new Error(`Bad Request: req.body.messages.${index}.content must be a string`)
-
-        if (typeof message.by !== 'string') throw new Error(`Bad Request: req.body.messages.${index}.by must be a string`)
-
-        if (!Object.values(ConversationMessageBy).includes(message.by as ConversationMessageBy))
-          throw new Error(`Bad Request: req.body.messages.${index}.by must be one of ${Object.values(ConversationMessageBy).join(', ')}`)
-
-        if (typeof message.createdAt !== 'string') throw new Error(`Bad Request: req.body.messages.${index}.createdAt must be a string`)
-
-        const createdAt = new Date(message.createdAt)
-
-        if (isNaN(createdAt.getTime())) throw new Error(`Bad Request: req.body.messages.${index}.createdAt must be a valid date`)
-        
-        return database.getRepository(ConversationMessage).create({
-          content: message.content,
-          by: message.by as ConversationMessageBy,
-          createdAt,
-        })
-      }),
-      subject: req.body.subject,
-    })
-
-    res.status(201)
-      .header('Location', `/conversations/${conversation.id}`)
-      .json(conversation)
-  }
+    } catch (error) {
+      console.log('Error creating conversation:', error);
+      res.status(500).json({ message: 'Internal Server Error'})
+    }
+  } 
 }

@@ -14,13 +14,32 @@ export class ConversationsController {
    * GET /conversations
    */
   public async find(req: Request, res: Response) {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 50;
+    const skip = (page - 1) * limit
+
+    const userId = req.token?.sub.split(':')[1];
+    const userRole = req.token?.role;
+    let whereCondition: any = {};
+
+    if (userRole !== 'sudo') whereCondition = { user: { id: userId }};
+
     const [conversations, count] = await this.repository.findAndCount({
-      relations: { consumer: true },
-      take: 25,
-      skip: 0
+      relations: { consumer: true, user: true, messages: true },
+      where: whereCondition,
+      take: limit,
+      skip: skip,
+      order: {
+        createdAt: 'DESC',
+      }
     })
 
-    res.json({ count, conversations })
+    res.json({
+      count,
+      page,
+      totalPages: Math.ceil(count/limit),
+      conversations,
+    })
   }
 
   /**

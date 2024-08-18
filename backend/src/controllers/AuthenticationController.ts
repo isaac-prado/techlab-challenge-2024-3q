@@ -4,6 +4,7 @@ import { User } from "../entities/User.js";
 import jwt from 'jsonwebtoken'
 import { APP_NAME, SECRET } from "../constants/env.js";
 import { profiles } from "../constants/profiles.js";
+import bcrypt from "bcrypt";
 
 export class AuthenticationController {
   /**
@@ -15,11 +16,11 @@ export class AuthenticationController {
     if (typeof req.body.username !== 'string') throw new Error('Bad Request: body.username is required')
 
     if (typeof req.body.password !== 'string') throw new Error('Bad Request: body.password is required')
-
+      
     const repository = database.getRepository(User)
 
     const user = await repository.findOneBy([
-      { email: req.body.username },
+      { email: req.body.email },
       { username: req.body.username }
     ])
 
@@ -33,7 +34,10 @@ export class AuthenticationController {
       
     const accessToken = await new Promise<string>((resolve, reject) => {
       jwt.sign(
-        { scopes: Array.isArray(scopes) ? scopes : [scopes] },
+        { scopes: Array.isArray(scopes) ? scopes : [scopes],
+          role: user.profile, // adicionando role: sudo || standard
+
+        },
         SECRET,
         {
           audience: APP_NAME,

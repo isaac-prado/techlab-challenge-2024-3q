@@ -16,6 +16,12 @@ app.use(cors())
 app.use(Express.json())
 
 app.post(
+  '/users',
+  scope('users: write'),
+  _catch((req, res) => singleton(UsersController).createUser(req, res))
+);
+
+app.post(
   '/auth/sign-in',
   _catch((req, res, next) => {
     singleton(AuthenticationController).signIn(req, res).catch(next)
@@ -71,25 +77,25 @@ app.get(
 
 app.get(
   '/conversations/:conversationId',
-  scope('conversations:*', 'conversations:read', req => [`conversations:${req.params.id}:*`, `conversations:${req.params.id}:read`], req => req.token.sub.startsWith('consumer:')),
+  scope('conversations:*', 'conversations:read', req => [`conversations:${req.params.conversationId}:*`, `conversations:${req.params.conversationId}:read`], req => req.token.sub.startsWith('consumer:')),
   _catch((req, res) => singleton(ConversationsController).findOne(req, res))
 )
 
 app.delete(
   '/conversations/:conversationId',
-  scope('conversations:*', 'conversations:write', req => [`conversations:${req.params.id}:*`, `conversations:${req.params.id}:write`], req => req.token.sub.startsWith('consumer:')),
+  scope('conversations:*', 'conversations:write', req => [`conversations:${req.params.conversationId}:*`, `conversations:${req.params.conversationId}:write`], req => req.token.sub.startsWith('consumer:')),
   _catch((req, res) => singleton(ConversationsController).delete(req, res))
 )
 
 app.get(
   '/conversations/:conversationId/messages',
-  scope('conversations:*', 'conversations:read', req => [`conversations:${req.params.id}:*`, `conversations:${req.params.id}:read`], req => req.token.sub.startsWith('consumer:')),
+  scope('conversations:*', 'conversations:read', req => [`conversations:${req.params.conversationId}:*`, `conversations:${req.params.conversationId}:read`], req => req.token.sub.startsWith('consumer:')),
   _catch((req, res) => singleton(ConversationsController).findMessages(req, res))
 )
 
 app.post(
   '/conversations/:conversationId/messages',
-  scope('conversations:*', 'conversations:write', req => [`conversations:${req.params.id}:*`, `conversations:${req.params.id}:write`], req => req.token.sub.startsWith('consumer:')),
+  scope('conversations:*', 'conversations:write', req => [`conversations:${req.params.conversationId}:*`, `conversations:${req.params.conversationId}:write`], req => req.token.sub.startsWith('consumer:')),
   _catch((req, res) => singleton(ConversationsController).addMessage(req, res))
 )
 
@@ -107,7 +113,7 @@ app.put(
 
 app.get(
   '/users/:userId',
-  scope('users:*', 'users:read', req => [`users:${req.params.id}:*`, `users:${req.params.id}:read`]),
+  scope('users:*', 'users:read', req => [`users:${req.params.userId}:*`, `users:${req.params.userId}:read`]),
   _catch((req, res) =>
     singleton(UsersController).findOne(req, res)
   )
@@ -115,7 +121,7 @@ app.get(
 
 app.patch(
   '/users/:userId',
-  scope('users:*', 'users:write', req => [`users:${req.params.id}:*`, `users:${req.params.id}:write`]),
+  scope('users:*', 'users:write', req => [`users:${req.params.userId}:*`, `users:${req.params.userId}:write`]),
   _catch((req, res) =>
     singleton(UsersController).update(req, res)
   )
@@ -123,9 +129,9 @@ app.patch(
 
 app.delete(
   '/users/:userId',
-  scope('users:*', 'users:write', req => [`users:${req.params.id}:*`, `users:${req.params.id}:write`]),
+  scope('users:*', 'users:write', req => [`users:${req.params.userId}:*`, `users:${req.params.userId}:write`]),
   _catch((req, res) => 
-    singleton(UsersController).save(req, res)
+    singleton(UsersController).delete(req, res)
   )
 )
 

@@ -18,17 +18,18 @@ export function scope(...oneOf: [Scope, ...Scope[]]) {
       SECRET,
       { audience: APP_NAME, issuer: APP_NAME },
       (err, payload) => {
-        if (err) return next(new Error('Unauthorized'))
+        if (err) {
+          console.error('Token verification error:', err);
+          return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+        }
 
-        if (typeof payload !== 'object') return next(new Error('Forbidden'))
-
-        if (typeof payload.sub !== 'string') return next(new Error('Forbidden'))
-
-        if (!Array.isArray(payload.scopes)) return next(new Error('Forbidden'))
+        if (typeof payload !== 'object' || typeof payload.sub !== 'string' || !Array.isArray(payload.scopes)) {
+          return res.status(403).json({ error: 'Forbidden: Invalid token payload' });
+        }
 
         req.token = payload as IToken
 
-        if (payload.scopes.includes('*')) return next()
+        if (req.token.role === 'sudo') return next();
 
         for (const pattern of oneOf) {
           if (typeof pattern === 'function') {
@@ -53,7 +54,8 @@ export function scope(...oneOf: [Scope, ...Scope[]]) {
           if (payload.scopes.includes(scope)) return next()
         }
 
-        return next(new Error('Forbidden'))
-      })
+        return res.status(403).json({ error: 'Forbidden: Insufficient scope' })
+      }
+    )
   }
 }
