@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { User } from "../entities/User.js";
 import { database } from "../services/database.js";
 import { Not } from "typeorm";
-import bcrypt from "bcrypt";
+import { hash } from "bcrypt";
 
 export class UsersController {
   protected get repository() {
@@ -61,40 +61,46 @@ export class UsersController {
   public async update(req: Request<{ userId: string }>, res: Response) {
     const user = await this.repository.findOne({
       where: { id: req.params.userId }
-    })
-
-    if (!user) return res.status(404).json({ message: `Not found User with ID ${req.params.userId}` })
-    
+    });
+  
+    if (!user) {
+      return res.status(404).json({ message: `Not found User with ID ${req.params.userId}` });
+    }
+  
+    // Verificar se o email já existe para outro usuário
     if (req.body.email && req.body.email !== user.email) {
-      const checkEmail = await this.repository.find({
-        where: { email: req.body.email, id: Not(req.params.userId )}
+      const checkEmail = await this.repository.findOne({
+        where: {
+          email: req.body.email,
+          id: Not(req.params.userId), // Exclui o usuário atual da verificação
+        }
       });
-
+  
       if (checkEmail) {
-        return res.status(400).json({ message: `Email address already used.` })
+        return res.status(400).json({ message: `Email address already used.` });
       }
     }
-
+  
+    // Verificar se o username já existe para outro usuário
     if (req.body.username && req.body.username !== user.username) {
-      const checkUsername = await this.repository.find({
-        where: { username: req.body.username, id: Not(req.params.userId)}
+      const checkUsername = await this.repository.findOne({
+        where: {
+          username: req.body.username,
+          id: Not(req.params.userId), // Exclui o usuário atual da verificação
+        }
       });
-
+  
       if (checkUsername) {
-        return res.status(400).json({ message: `Username already used.` })
+        return res.status(400).json({ message: `Username already used.` });
       }
     }
-
+  
+    // Atualiza os dados do usuário
     const newUserData = { ...req.body };
-
-    if (newUserData.password) {
-      const saltRounds = 10;
-      newUserData.password = await bcrypt.hash(newUserData.password, saltRounds);
-    }
-
+  
     const updatedUserEntity = this.repository.merge(user, newUserData);
     await this.repository.save(updatedUserEntity);
-
+  
     return res.json(updatedUserEntity);
   }
 
@@ -134,7 +140,7 @@ export class UsersController {
       return res.status(409).json({ message: 'Conflict: Username or email already exists.' });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await hash(password, 10);
 
     const userRepository = database.getRepository(User);
     const newUser = userRepository.create({

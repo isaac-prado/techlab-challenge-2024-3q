@@ -1,6 +1,6 @@
 import { Box, MenuItem, Select, TextField } from "@mui/material";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { api } from "../services/api";
 import { useAccessToken } from "../hooks/useAuthenticationContext";
@@ -19,12 +19,18 @@ export function UserScreen() {
 
   const save = useMutation({
     mutationFn: async (user: Partial<IUser>) => {
-      // Mudança de PUT -> PATCH
-      await api.patch(`/users/${user.id}`, { ...user }, {
-        headers: { Authorization: `Bearer ${accessToken}` }
-      })
+      try {
+        console.log('Data being sent to the server:', JSON.stringify(user, null, 2));
+        const response = await api.patch(`/users/${user.id}`, user, {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        console.log('User updated successfully:', response.data);
+      } catch (error) {
+        console.error('Failed to update user:', error);
+        throw error;
+      }
     }
-  })
+  });
 
   const user = useQuery({
     queryKey: ['users', userId],
@@ -40,15 +46,18 @@ export function UserScreen() {
   const form = useForm<Partial<IUser>>({})
 
   useEffect(() => {
-    if (!user.data) return;
-
-    Object.entries(user.data).map(([key, value]) => {
-      // @ts-expect-error: I know exactly what I'm doing ok?
-      form.setValue(key, value)
-    })
-  }, [user.data])
+    if (user.data) {
+      for (const [key, value] of Object.entries(user.data)) {
+        form.setValue(key as keyof IUser, value as any);
+      }
+    }
+  }, [user.data, form]);
 
   if (!user.data) return 'Carregando...'
+
+  const onSubmit: SubmitHandler<Partial<IUser>> = (data) => {
+    save.mutate(data);
+  }
 
   return (
     <Box>
@@ -69,8 +78,7 @@ export function UserScreen() {
       </Box>
       <Box>
       <LoadingButton loading={save.isPending} variant="contained" style={{ padding: 16 }} startIcon={<SaveIcon />} onClick={
-        // @ts-expect-error: I know exactly what I'm doing ok?
-        form.handleSubmit(save.mutate)}
+        form.handleSubmit(onSubmit)}
       >
         Salvar
       </LoadingButton>

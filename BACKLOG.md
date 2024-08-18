@@ -2,7 +2,7 @@
 
 Esse é o backlog do projeto. Aqui estão listadas todas as funcionalidades e correções que serão poderão adicionadas no projeto.
 
-## Bug - Consumidor com erro na aplicação
+## SOLVED?: Bug - Consumidor com erro na aplicação
 
 <details close>
 

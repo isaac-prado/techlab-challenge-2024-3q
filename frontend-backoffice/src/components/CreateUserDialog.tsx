@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { api } from "../services/api";
 import { IUserCreateForm } from "../interfaces/IUserCreateForm";
 import { useForm } from "react-hook-form";
