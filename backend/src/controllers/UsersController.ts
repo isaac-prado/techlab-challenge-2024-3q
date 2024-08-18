@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { User } from "../entities/User.js";
 import { database } from "../services/database.js";
 import { Not } from "typeorm";
-import { hash } from "bcrypt";
+import bcrypt from "bcrypt";
 
 export class UsersController {
   protected get repository() {
@@ -87,6 +87,11 @@ export class UsersController {
 
     const newUserData = { ...req.body };
 
+    if (newUserData.password) {
+      const saltRounds = 10;
+      newUserData.password = await bcrypt.hash(newUserData.password, saltRounds);
+    }
+
     const updatedUserEntity = this.repository.merge(user, newUserData);
     await this.repository.save(updatedUserEntity);
 
@@ -129,7 +134,7 @@ export class UsersController {
       return res.status(409).json({ message: 'Conflict: Username or email already exists.' });
     }
 
-    const hashedPassword = await hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const userRepository = database.getRepository(User);
     const newUser = userRepository.create({
