@@ -1,12 +1,14 @@
 # Tech Lab Challenge 2024 3q
 
-Esse projeto é uma aplicação de chat para consumidores e atendentes, com interfaces próprias para cada um. Porém, as aplicações ainda têm alguns bugs, problemas de desempenho, falhas de segurança e funcionalidades que não foram implementadas.
+### Apresentação do Código em Video
 
-O seu desafio é resolver esses problemas e adicionar as funcionalidades que estão faltando para que o sistema funcione de forma correta.
+[Youtube](https://youtu.be/Abczr9s6qrI)
 
-Vocês têm a liberdade de começar por onde se sentirem confortável, implementando da forma que acharem melhor. Também pode realizar as edições que achar necessário para que o desenvolvimento alcance o objetivo desejado.
+### Sobre o desafio
 
-Refatorações completas são aceitas, inclusive de linguagens de programação, desde que o objetivo seja alcançado.
+Primeiramente, gostaria de expressar minha profunda gratidão ao Tony, que me apoiou e orientou ao longo deste projeto, com mentorias importantes, sua paciência e sabedoria me ajudaram bastante.
+
+Este projeto também representa uma oportunidade incrível que me foi dada, e por isso, agradeço imensamente. Ao longo do desenvolvimento, enfrentei algumas dificuldades, principalmente ao lidar com um código já existente e na persistência de alguns erros. No entanto, cada obstáculo foi uma oportunidade de aprendizado, e estou confiante de que, com o tempo e dedicação, posso contribuir significativamente no futuro.
 
 ## Começando
 
