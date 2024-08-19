@@ -4,7 +4,7 @@ import { User } from "../entities/User.js";
 import jwt from 'jsonwebtoken'
 import { APP_NAME, SECRET } from "../constants/env.js";
 import { profiles } from "../constants/profiles.js";
-import bcrypt from "bcrypt";
+import { compare } from "bcrypt";
 
 export class AuthenticationController {
   /**
@@ -26,7 +26,9 @@ export class AuthenticationController {
 
     if (!user) throw new Error('User not found')
 
-    if (user.password !== req.body.password) throw new Error('Invalid password')
+    const isPasswordValid = await compare(req.body.password, user.password)
+
+    if (!isPasswordValid) throw new Error('Invalid password')
 
     const profile = profiles[user.profile]
 

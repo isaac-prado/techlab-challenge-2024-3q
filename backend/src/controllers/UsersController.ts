@@ -67,12 +67,11 @@ export class UsersController {
       return res.status(404).json({ message: `Not found User with ID ${req.params.userId}` });
     }
   
-    // Verificar se o email já existe para outro usuário
     if (req.body.email && req.body.email !== user.email) {
       const checkEmail = await this.repository.findOne({
         where: {
           email: req.body.email,
-          id: Not(req.params.userId), // Exclui o usuário atual da verificação
+          id: Not(req.params.userId),
         }
       });
   
@@ -81,12 +80,11 @@ export class UsersController {
       }
     }
   
-    // Verificar se o username já existe para outro usuário
     if (req.body.username && req.body.username !== user.username) {
       const checkUsername = await this.repository.findOne({
         where: {
           username: req.body.username,
-          id: Not(req.params.userId), // Exclui o usuário atual da verificação
+          id: Not(req.params.userId),
         }
       });
   
@@ -94,8 +92,11 @@ export class UsersController {
         return res.status(400).json({ message: `Username already used.` });
       }
     }
+
+    if (req.body.password) {
+      req.body.password = await hash(req.body.password, 10)
+    }
   
-    // Atualiza os dados do usuário
     const newUserData = { ...req.body };
   
     const updatedUserEntity = this.repository.merge(user, newUserData);
